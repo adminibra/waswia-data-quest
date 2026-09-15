@@ -33,20 +33,21 @@ const initialSurveys: Survey[] = [
   { id: 3, title: "PARTICULIER", description: "Pas de description", questions: 46, active: false },
 ];
 
-const initialInvestigators: Investigator[] = [
+const investigatorSeed: Array<[string, string]> = [
   ["Abdou Mhadji", "mhadjiabdou19@gmail.com"], ["Boura Ahamadi Ismaila", "bouraismaila54@gmail.com"],
   ["Said Saendia", "saendiasaidlinda@gmail.com"], ["Moutuinllah Faouzi", "moutuinllahfaouzi@gmail.com"],
   ["Hamidi Said Bahia", "bahia@gmail.com"], ["Chamsouddine Anli-Yachrout", "anliyachourtu123@gmail.com"],
   ["Daniel Abdoul Madji", "abdoulaniel51@gmail.com"], ["Narmine Mohamed Chabane", "chabane@gmail.com"],
   ["Hassani Mo inssalama", "moinsalama@gmail.com"], ["Fatima Ahmed", "fatima.ahmed@gmail.com"],
   ["Ali Soilihi", "ali.soilihi@gmail.com"], ["Mariam Said", "mariam.said@gmail.com"],
-].map(([name, email], index) => ({ id: index + 1, name, email, surveys: 0 }));
+];
+const initialInvestigators: Investigator[] = investigatorSeed.map(([name, email], index) => ({ id: index + 1, name, email, surveys: 0 }));
 
 const names = ["Daniel Abdoul Madji", "Hamidi Said Bahia", "Abdou Mhadji", "Said Saendia"];
 const initialResponses: FieldResponse[] = Array.from({ length: 24 }, (_, index) => ({
   id: index + 1,
   survey: index % 5 === 0 ? "PARTICULIER" : "Entreprise/Institution/ONG",
-  investigator: names[index % names.length],
+  investigator: names[index % names.length] ?? "Abdou Mhadji",
   date: `02/04/2026 ${19 - Math.floor(index / 4)}:${String(26 - (index * 7) % 27).padStart(2, "0")}`,
   gps: index % 3 === 0 ? "11.7172, 43.2473" : "-",
   status: "Terminé",
