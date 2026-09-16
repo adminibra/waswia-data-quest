@@ -17,6 +17,7 @@ import { Route as AdminInvestigatorsRouteImport } from './routes/admin.investiga
 import { Route as AdminReportingRouteImport } from './routes/admin.reporting'
 import { Route as AdminResponsesRouteImport } from './routes/admin.responses'
 import { Route as AdminSurveysRouteImport } from './routes/admin.surveys'
+import { Route as AdminSurveysSurveyIdRouteImport } from './routes/admin.surveys.$surveyId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -58,6 +59,11 @@ const AdminSurveysRoute = AdminSurveysRouteImport.update({
   path: '/surveys',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSurveysSurveyIdRoute = AdminSurveysSurveyIdRouteImport.update({
+  id: '/$surveyId',
+  path: '/$surveyId',
+  getParentRoute: () => AdminSurveysRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,8 +72,9 @@ export interface FileRoutesByFullPath {
   '/admin/investigators': typeof AdminInvestigatorsRoute
   '/admin/reporting': typeof AdminReportingRoute
   '/admin/responses': typeof AdminResponsesRoute
-  '/admin/surveys': typeof AdminSurveysRoute
+  '/admin/surveys': typeof AdminSurveysRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+  '/admin/surveys/$surveyId': typeof AdminSurveysSurveyIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,8 +82,9 @@ export interface FileRoutesByTo {
   '/admin/investigators': typeof AdminInvestigatorsRoute
   '/admin/reporting': typeof AdminReportingRoute
   '/admin/responses': typeof AdminResponsesRoute
-  '/admin/surveys': typeof AdminSurveysRoute
+  '/admin/surveys': typeof AdminSurveysRouteWithChildren
   '/admin': typeof AdminIndexRoute
+  '/admin/surveys/$surveyId': typeof AdminSurveysSurveyIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,8 +94,9 @@ export interface FileRoutesById {
   '/admin/investigators': typeof AdminInvestigatorsRoute
   '/admin/reporting': typeof AdminReportingRoute
   '/admin/responses': typeof AdminResponsesRoute
-  '/admin/surveys': typeof AdminSurveysRoute
+  '/admin/surveys': typeof AdminSurveysRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+  '/admin/surveys/$surveyId': typeof AdminSurveysSurveyIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/admin/responses'
     | '/admin/surveys'
     | '/admin/'
+    | '/admin/surveys/$surveyId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/admin/responses'
     | '/admin/surveys'
     | '/admin'
+    | '/admin/surveys/$surveyId'
   id:
     | '__root__'
     | '/'
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/admin/responses'
     | '/admin/surveys'
     | '/admin/'
+    | '/admin/surveys/$surveyId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -185,14 +197,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSurveysRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/surveys/$surveyId': {
+      id: '/admin/surveys/$surveyId'
+      path: '/$surveyId'
+      fullPath: '/admin/surveys/$surveyId'
+      preLoaderRoute: typeof AdminSurveysSurveyIdRouteImport
+      parentRoute: typeof AdminSurveysRoute
+    }
   }
 }
+
+interface AdminSurveysRouteChildren {
+  AdminSurveysSurveyIdRoute: typeof AdminSurveysSurveyIdRoute
+}
+
+const AdminSurveysRouteChildren: AdminSurveysRouteChildren = {
+  AdminSurveysSurveyIdRoute: AdminSurveysSurveyIdRoute,
+}
+
+const AdminSurveysRouteWithChildren = AdminSurveysRoute._addFileChildren(
+  AdminSurveysRouteChildren,
+)
 
 interface AdminRouteChildren {
   AdminInvestigatorsRoute: typeof AdminInvestigatorsRoute
   AdminReportingRoute: typeof AdminReportingRoute
   AdminResponsesRoute: typeof AdminResponsesRoute
-  AdminSurveysRoute: typeof AdminSurveysRoute
+  AdminSurveysRoute: typeof AdminSurveysRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -200,7 +231,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminInvestigatorsRoute: AdminInvestigatorsRoute,
   AdminReportingRoute: AdminReportingRoute,
   AdminResponsesRoute: AdminResponsesRoute,
-  AdminSurveysRoute: AdminSurveysRoute,
+  AdminSurveysRoute: AdminSurveysRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
 }
 
