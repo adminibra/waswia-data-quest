@@ -53,10 +53,16 @@ const initialResponses: FieldResponse[] = Array.from({ length: 24 }, (_, index) 
   status: "Terminé",
 }));
 
+export type Assignments = Record<number, number[]>;
+
 type Store = {
   surveys: Survey[];
   investigators: Investigator[];
   responses: FieldResponse[];
+  assignments: Assignments;
+  assignedSurveys: (investigatorId: number) => Survey[];
+  assignSurvey: (investigatorId: number, surveyId: number) => void;
+  unassignSurvey: (investigatorId: number, surveyId: number) => void;
   addSurvey: (survey: Omit<Survey, "id">) => void;
   updateSurvey: (survey: Survey) => void;
   toggleSurvey: (id: number) => void;
