@@ -28,7 +28,7 @@ export function AdminShell() {
         </div>
         <nav className="flex-1 space-y-1 px-4 py-5">
           {links.map((item) => {
-            const active = pathname === item.to;
+            const active = item.to === "/admin" ? pathname === item.to || pathname === "/admin/" : pathname.startsWith(item.to);
             return <Link key={item.to} to={item.to} onClick={() => setMobileOpen(false)} title={collapsed ? item.label : undefined} className={cn("flex h-12 items-center gap-3 rounded-lg px-4 text-muted-foreground transition-colors hover:bg-muted", active && "bg-primary text-primary-foreground hover:bg-primary", collapsed && "justify-center px-0")}><item.icon className="h-5 w-5 shrink-0" />{!collapsed && <span>{item.label}</span>}</Link>;
           })}
         </nav>
