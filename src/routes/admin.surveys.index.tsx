@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useWaswia, type Survey } from "@/lib/waswia-store";
 
-export const Route = createFileRoute("/admin/surveys")({
+export const Route = createFileRoute("/admin/surveys/")({
   head: () => ({ meta: [{ title: "Sondages — WASWIA" }, { name: "description", content: "Créez et gérez les questionnaires WASWIA." }, { property: "og:title", content: "Sondages — WASWIA" }, { property: "og:description", content: "Créez et gérez les questionnaires WASWIA." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: Surveys,
 });
 
