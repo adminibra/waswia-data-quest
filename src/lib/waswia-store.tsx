@@ -94,7 +94,7 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
     addInvestigator: (person) => setInvestigators((items) => [...items, { ...person, id: Date.now(), surveys: 0 }]),
     deleteInvestigator: (id) => setInvestigators((items) => items.filter((item) => item.id !== id)),
     deleteResponse: (id) => setResponses((items) => items.filter((item) => item.id !== id)),
-  }), [surveys, investigators, responses]);
+  }), [surveys, investigators, responses, assignments]);
   return <WaswiaContext.Provider value={value}>{children}</WaswiaContext.Provider>;
 }
 
