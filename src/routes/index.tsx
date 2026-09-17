@@ -18,7 +18,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { surveys } = useWaswia();
+  const { surveys, responses } = useWaswia();
+  const doneCount = responses.filter((response) => response.status === "Terminé").length;
+  const pendingCount = responses.filter((response) => response.status === "En attente").length;
   const [syncing, setSyncing] = useState(false);
   const sync = () => { setSyncing(true); window.setTimeout(() => setSyncing(false), 900); };
   return (
