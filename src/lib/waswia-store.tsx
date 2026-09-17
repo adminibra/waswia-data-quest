@@ -78,10 +78,15 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
   const [surveys, setSurveys] = useState(initialSurveys);
   const [investigators, setInvestigators] = useState(initialInvestigators);
   const [responses, setResponses] = useState(initialResponses);
+  const [assignments, setAssignments] = useState<Assignments>({});
   const value = useMemo<Store>(() => ({
     surveys,
-    investigators,
+    investigators: investigators.map((person) => ({ ...person, surveys: assignments[person.id]?.length ?? 0 })),
     responses,
+    assignments,
+    assignedSurveys: (investigatorId) => surveys.filter((survey) => (assignments[investigatorId] ?? []).includes(survey.id)),
+    assignSurvey: (investigatorId, surveyId) => setAssignments((items) => ({ ...items, [investigatorId]: [...new Set([...(items[investigatorId] ?? []), surveyId])] })),
+    unassignSurvey: (investigatorId, surveyId) => setAssignments((items) => ({ ...items, [investigatorId]: (items[investigatorId] ?? []).filter((id) => id !== surveyId) })),
     addSurvey: (survey) => setSurveys((items) => [...items, { ...survey, id: Date.now() }]),
     updateSurvey: (survey) => setSurveys((items) => items.map((item) => item.id === survey.id ? survey : item)),
     toggleSurvey: (id) => setSurveys((items) => items.map((item) => item.id === id ? { ...item, active: !item.active } : item)),
