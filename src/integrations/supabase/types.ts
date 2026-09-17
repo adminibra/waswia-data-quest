@@ -14,7 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assignments: {
+        Row: {
+          created_at: string
+          id: string
+          investigator_id: string
+          survey_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          investigator_id: string
+          survey_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          investigator_id?: string
+          survey_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_investigator_id_fkey"
+            columns: ["investigator_id"]
+            isOneToOne: false
+            referencedRelation: "investigators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investigators: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      responses: {
+        Row: {
+          collected_at: string
+          gps: string
+          id: string
+          investigator_id: string | null
+          investigator_name: string
+          status: string
+          survey_id: string | null
+          survey_title: string
+        }
+        Insert: {
+          collected_at?: string
+          gps?: string
+          id?: string
+          investigator_id?: string | null
+          investigator_name?: string
+          status?: string
+          survey_id?: string | null
+          survey_title?: string
+        }
+        Update: {
+          collected_at?: string
+          gps?: string
+          id?: string
+          investigator_id?: string | null
+          investigator_name?: string
+          status?: string
+          survey_id?: string | null
+          survey_title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "responses_investigator_id_fkey"
+            columns: ["investigator_id"]
+            isOneToOne: false
+            referencedRelation: "investigators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responses_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      surveys: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string
+          id: string
+          is_public: boolean
+          questions: number
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          is_public?: boolean
+          questions?: number
+          title: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          is_public?: boolean
+          questions?: number
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
