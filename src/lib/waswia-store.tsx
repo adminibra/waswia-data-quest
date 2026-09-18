@@ -81,7 +81,7 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
     return () => data.subscription.unsubscribe();
   }, [refresh]);
 
-  const run = useCallback(async (action: () => Promise<unknown>) => { await action(); await refresh(); }, [refresh]);
+  const run = useCallback(async (action: () => PromiseLike<unknown>) => { await action(); await refresh(); }, [refresh]);
 
   const value = useMemo<Store>(() => ({
     loading,
