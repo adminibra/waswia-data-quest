@@ -12,7 +12,7 @@ export const Route = createFileRoute("/admin/investigators")({ head: () => ({ me
 
 function Investigators() {
   const { investigators, surveys, assignments, addInvestigator, deleteInvestigator, assignSurvey, unassignSurvey } = useWaswia();
-  const [query, setQuery] = useState(""); const [open, setOpen] = useState(false); const [assignId, setAssignId] = useState<number | null>(null);
+  const [query, setQuery] = useState(""); const [open, setOpen] = useState(false); const [assignId, setAssignId] = useState<string | null>(null);
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const data = new FormData(event.currentTarget); addInvestigator({ name: String(data.get("name")), email: String(data.get("email")) }); setOpen(false); };
   const filtered = investigators.filter((p) => `${p.name} ${p.email}`.toLowerCase().includes(query.toLowerCase()));
   const target = investigators.find((p) => p.id === assignId) ?? null;
