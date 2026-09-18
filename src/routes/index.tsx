@@ -18,11 +18,13 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { surveys, responses } = useWaswia();
+  const { surveys, responses, refresh } = useWaswia();
   const doneCount = responses.filter((response) => response.status === "Terminé").length;
   const pendingCount = responses.filter((response) => response.status === "En attente").length;
   const [syncing, setSyncing] = useState(false);
-  const sync = () => { setSyncing(true); window.setTimeout(() => setSyncing(false), 900); };
+  const [email, setEmail] = useState("");
+  useEffect(() => { void supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? "")); }, []);
+  const sync = () => { setSyncing(true); void refresh().finally(() => window.setTimeout(() => setSyncing(false), 400)); };
   return (
     <div className="min-h-screen bg-admin-background">
       <header className="flex h-[72px] items-center justify-between bg-brand-gradient px-4 shadow-md">
