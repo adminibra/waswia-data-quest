@@ -3,7 +3,8 @@ import { CheckCircle2, ChevronRight, ClipboardList, CloudDownload, CloudUpload, 
 import { Button } from "@/components/ui/button";
 import { WaswiaLogo } from "@/components/waswia-logo";
 import { useWaswia } from "@/lib/waswia-store";
-import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -18,19 +19,22 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { surveys, responses } = useWaswia();
+  const { surveys, responses, refresh } = useWaswia();
   const doneCount = responses.filter((response) => response.status === "Terminé").length;
   const pendingCount = responses.filter((response) => response.status === "En attente").length;
   const [syncing, setSyncing] = useState(false);
-  const sync = () => { setSyncing(true); window.setTimeout(() => setSyncing(false), 900); };
+  const [email, setEmail] = useState("");
+  const navigate = Route.useNavigate();
+  useEffect(() => { void supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? "")); }, []);
+  const sync = () => { setSyncing(true); void refresh().finally(() => window.setTimeout(() => setSyncing(false), 400)); };
   return (
     <div className="min-h-screen bg-admin-background">
       <header className="flex h-[72px] items-center justify-between bg-brand-gradient px-4 shadow-md">
         <WaswiaLogo className="h-8 rounded-sm sm:h-10" />
-        <div className="flex items-center gap-3"><span className="inline-flex items-center gap-2 rounded-full bg-cyan px-4 py-2 text-xs font-semibold text-primary-foreground"><Wifi className="h-3.5 w-3.5" /> En ligne</span><Button variant="ghost" size="icon" asChild className="text-primary-foreground hover:bg-background/10 hover:text-primary-foreground"><Link to="/auth"><LogOut /></Link></Button></div>
+        <div className="flex items-center gap-3"><span className="inline-flex items-center gap-2 rounded-full bg-cyan px-4 py-2 text-xs font-semibold text-primary-foreground"><Wifi className="h-3.5 w-3.5" /> En ligne</span><Button variant="ghost" size="icon" onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth" }); }} className="text-primary-foreground hover:bg-background/10 hover:text-primary-foreground" aria-label="Déconnexion"><LogOut /></Button></div>
       </header>
       <main className="mx-auto max-w-[1400px] space-y-6 px-4 py-6 sm:px-6">
-        <section><h1 className="text-2xl font-bold">Bonjour 👋</h1><p className="mt-1 text-muted-foreground">abdouelanzize95@gmail.com</p><span className="mt-2 inline-flex rounded-full bg-cyan px-3 py-1 text-xs font-bold text-primary-foreground">Admin</span></section>
+        <section><h1 className="text-2xl font-bold">Bonjour 👋</h1><p className="mt-1 text-muted-foreground">{email || "Non connecté"}</p><span className="mt-2 inline-flex rounded-full bg-cyan px-3 py-1 text-xs font-bold text-primary-foreground">Admin</span></section>
         <section className="rounded-xl bg-card p-4 shadow-md sm:p-5">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4"><h2 className="flex min-w-0 items-center gap-2 font-bold"><Database className="h-5 w-5 shrink-0 text-primary" /> Synchronisation</h2><Button onClick={sync} className="bg-primary"><RotateCw className={syncing ? "animate-spin" : ""} /> <span className="hidden sm:inline">Synchroniser</span></Button></div>
           <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2"><p className="flex items-center gap-2"><CloudUpload className="h-4 w-4 text-warning" /><b>0</b> réponse(s) en attente</p><p className="flex items-center gap-2 sm:justify-center"><CloudDownload className="h-4 w-4 text-success" />{syncing ? "Synchronisation..." : "Dernière sync: 09/09/2026 14:35"}</p></div>
