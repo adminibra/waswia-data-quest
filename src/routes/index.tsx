@@ -24,6 +24,7 @@ function Index() {
   const pendingCount = responses.filter((response) => response.status === "En attente").length;
   const [syncing, setSyncing] = useState(false);
   const [email, setEmail] = useState("");
+  const navigate = Route.useNavigate();
   useEffect(() => { void supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? "")); }, []);
   const sync = () => { setSyncing(true); void refresh().finally(() => window.setTimeout(() => setSyncing(false), 400)); };
   return (
