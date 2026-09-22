@@ -1,9 +1,10 @@
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { BarChart3, ClipboardList, FileText, LayoutDashboard, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Users, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WaswiaLogo } from "@/components/waswia-logo";
 import { cn } from "@/lib/utils";
+import { useWaswia } from "@/lib/waswia-store";
 
 const links = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -17,6 +18,10 @@ export function AdminShell() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const { loading, currentInvestigator } = useWaswia();
+  const navigate = useNavigate();
+  useEffect(() => { if (!loading && currentInvestigator) void navigate({ to: "/", replace: true }); }, [loading, currentInvestigator, navigate]);
+  if (currentInvestigator) return null;
   return (
     <div className="min-h-screen bg-admin-background">
       <Button variant="outline" size="icon" className="fixed left-4 top-4 z-40 md:hidden" onClick={() => setMobileOpen(true)} aria-label="Ouvrir le menu"><Menu /></Button>
