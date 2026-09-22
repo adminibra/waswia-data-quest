@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { createInvestigatorAccount } from "@/lib/investigators.functions";
 
 export type Survey = {
   id: string;
@@ -10,7 +11,7 @@ export type Survey = {
   isPublic?: boolean;
 };
 
-export type Investigator = { id: string; name: string; email: string; surveys: number };
+export type Investigator = { id: string; name: string; email: string; surveys: number; userId: string | null };
 export type FieldResponse = {
   id: string;
   survey: string;
@@ -28,6 +29,8 @@ type Store = {
   investigators: Investigator[];
   responses: FieldResponse[];
   assignments: Assignments;
+  currentInvestigator: Investigator | null;
+  isAdmin: boolean;
   refresh: () => Promise<void>;
   assignedSurveys: (investigatorId: string) => Survey[];
   assignSurvey: (investigatorId: string, surveyId: string) => void;
@@ -36,7 +39,7 @@ type Store = {
   updateSurvey: (survey: Survey) => void;
   toggleSurvey: (id: string) => void;
   deleteSurvey: (id: string) => void;
-  addInvestigator: (person: Omit<Investigator, "id" | "surveys">) => void;
+  addInvestigator: (person: { name: string; email: string; password: string }) => Promise<{ ok: boolean; message?: string }>;
   deleteInvestigator: (id: string) => void;
   deleteResponse: (id: string) => void;
 };
@@ -54,6 +57,7 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
   const [responses, setResponses] = useState<FieldResponse[]>([]);
   const [assignments, setAssignments] = useState<Assignments>({});
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     const [surveyRows, investigatorRows, responseRows, assignmentRows] = await Promise.all([
@@ -63,7 +67,7 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
       supabase.from("assignments").select("*"),
     ]);
     setSurveys((surveyRows.data ?? []).map((row) => ({ id: row.id, title: row.title, description: row.description, questions: row.questions, active: row.active, isPublic: row.is_public })));
-    setInvestigators((investigatorRows.data ?? []).map((row) => ({ id: row.id, name: row.name, email: row.email })));
+    setInvestigators((investigatorRows.data ?? []).map((row) => ({ id: row.id, name: row.name, email: row.email, userId: row.user_id ?? null })));
     setResponses((responseRows.data ?? []).map((row) => ({ id: row.id, survey: row.survey_title, investigator: row.investigator_name, date: formatDate(row.collected_at), gps: row.gps, status: row.status === "En attente" ? "En attente" : "Terminé" })));
     const map: Assignments = {};
     for (const row of assignmentRows.data ?? []) {
@@ -75,20 +79,29 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void refresh();
-    const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT") void refresh();
+    void supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        setUserId(session?.user?.id ?? null);
+        void refresh();
+      }
     });
     return () => data.subscription.unsubscribe();
   }, [refresh]);
 
   const run = useCallback(async (action: () => PromiseLike<unknown>) => { await action(); await refresh(); }, [refresh]);
 
-  const value = useMemo<Store>(() => ({
+  const value = useMemo<Store>(() => {
+    const fullInvestigators = investigators.map((person) => ({ ...person, surveys: assignments[person.id]?.length ?? 0 }));
+    const currentInvestigator = userId ? fullInvestigators.find((person) => person.userId === userId) ?? null : null;
+    return {
     loading,
     surveys,
-    investigators: investigators.map((person) => ({ ...person, surveys: assignments[person.id]?.length ?? 0 })),
+    investigators: fullInvestigators,
     responses,
     assignments,
+    currentInvestigator,
+    isAdmin: !currentInvestigator,
     refresh,
     assignedSurveys: (investigatorId) => surveys.filter((survey) => (assignments[investigatorId] ?? []).includes(survey.id)),
     assignSurvey: (investigatorId, surveyId) => { void run(() => supabase.from("assignments").insert({ investigator_id: investigatorId, survey_id: surveyId }).then()); },
@@ -97,10 +110,19 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
     updateSurvey: (survey) => { void run(() => supabase.from("surveys").update({ title: survey.title, description: survey.description, questions: survey.questions, active: survey.active, is_public: survey.isPublic ?? false }).eq("id", survey.id).then()); },
     toggleSurvey: (id) => { const current = surveys.find((item) => item.id === id); if (!current) return; void run(() => supabase.from("surveys").update({ active: !current.active }).eq("id", id).then()); },
     deleteSurvey: (id) => { void run(() => supabase.from("surveys").delete().eq("id", id).then()); },
-    addInvestigator: (person) => { void run(() => supabase.from("investigators").insert({ name: person.name, email: person.email }).then()); },
+    addInvestigator: async (person) => {
+      try {
+        const result = await createInvestigatorAccount({ data: person });
+        await refresh();
+        return result.ok ? { ok: true } : { ok: false, message: result.message };
+      } catch (error) {
+        return { ok: false, message: error instanceof Error ? error.message : "Erreur inconnue" };
+      }
+    },
     deleteInvestigator: (id) => { void run(() => supabase.from("investigators").delete().eq("id", id).then()); },
     deleteResponse: (id) => { void run(() => supabase.from("responses").delete().eq("id", id).then()); },
-  }), [loading, surveys, investigators, responses, assignments, refresh, run]);
+    };
+  }, [loading, surveys, investigators, responses, assignments, refresh, run, userId]);
 
   return <WaswiaContext.Provider value={value}>{children}</WaswiaContext.Provider>;
 }
