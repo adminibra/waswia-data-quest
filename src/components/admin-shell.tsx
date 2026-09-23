@@ -1,8 +1,10 @@
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { BarChart3, ClipboardList, FileText, LayoutDashboard, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Users, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { BarChart3, ClipboardList, FileText, KeyRound, LayoutDashboard, LogOut, Menu, PanelLeftClose, PanelLeftOpen, Users, X } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { WaswiaLogo } from "@/components/waswia-logo";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useWaswia } from "@/lib/waswia-store";
 
@@ -17,10 +19,26 @@ const links = [
 export function AdminShell() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordMessage, setPasswordMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [saving, setSaving] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const { loading, currentInvestigator } = useWaswia();
   const navigate = useNavigate();
   useEffect(() => { if (!loading && currentInvestigator) void navigate({ to: "/", replace: true }); }, [loading, currentInvestigator, navigate]);
+  useEffect(() => { void supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? "")); }, []);
+
+  const changePassword = async (event: FormEvent) => {
+    event.preventDefault();
+    setSaving(true); setPasswordMessage(null);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setSaving(false);
+    if (error) { setPasswordMessage({ ok: false, text: error.message }); return; }
+    setPasswordMessage({ ok: true, text: "Mot de passe mis à jour." });
+    setNewPassword("");
+  };
   if (currentInvestigator) return null;
   return (
     <div className="min-h-screen bg-admin-background">
@@ -39,9 +57,10 @@ export function AdminShell() {
         </nav>
         <div className="border-t border-border p-4">
           <div className={cn("mb-4 flex items-center gap-3", collapsed && "justify-center")}>
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-gradient text-sm font-semibold text-primary-foreground">A</div>
-            {!collapsed && <div className="min-w-0"><p className="truncate text-sm font-medium">abdouelanzize95@gmail.com</p><p className="text-xs text-muted-foreground">Administrateur</p></div>}
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-gradient text-sm font-semibold text-primary-foreground">{(email[0] ?? "A").toUpperCase()}</div>
+            {!collapsed && <div className="min-w-0"><p className="truncate text-sm font-medium">{email || "Administrateur"}</p><p className="text-xs text-muted-foreground">Administrateur</p></div>}
           </div>
+          {!collapsed && <Button variant="ghost" className="mb-2 w-full justify-start text-muted-foreground" onClick={() => { setPasswordOpen(true); setPasswordMessage(null); }}><KeyRound className="h-4 w-4" /> Changer le mot de passe</Button>}
           <div className={cn("grid gap-2", collapsed ? "grid-cols-1" : "grid-cols-[1fr_auto]")}>
             <Button variant="outline" asChild className={cn("w-full", collapsed && "px-0")}><Link to="/">‹ {!collapsed && "App"}</Link></Button>
             <Button variant="ghost" size="icon" asChild aria-label="Se déconnecter"><Link to="/auth"><LogOut /></Link></Button>
@@ -50,6 +69,18 @@ export function AdminShell() {
         <Button variant="outline" size="icon" className="absolute -right-4 top-24 hidden rounded-full md:inline-flex" onClick={() => setCollapsed((v) => !v)} aria-label={collapsed ? "Déployer le menu" : "Réduire le menu"}>{collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}</Button>
       </aside>
       <main className={cn("min-h-screen transition-[margin]", collapsed ? "md:ml-[76px]" : "md:ml-64")}><div className="mx-auto max-w-[1400px] px-5 py-8 sm:px-8 md:px-10"><Outlet /></div></main>
+      <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Changer le mot de passe</DialogTitle></DialogHeader>
+          <form onSubmit={changePassword} className="space-y-4">
+            <label className="block text-sm font-medium">Nouveau mot de passe
+              <input required type="password" minLength={6} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="6 caractères minimum" className="mt-2 h-11 w-full rounded-lg border border-input bg-admin-background px-3 text-sm outline-none" />
+            </label>
+            {passwordMessage && <p className={cn("rounded-lg p-3 text-sm", passwordMessage.ok ? "bg-emerald-500/10 text-emerald-600" : "bg-destructive/10 text-destructive")}>{passwordMessage.text}</p>}
+            <Button disabled={saving} className="h-11 w-full bg-brand-gradient">{saving ? "Enregistrement..." : "Enregistrer"}</Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
