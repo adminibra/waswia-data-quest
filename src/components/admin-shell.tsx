@@ -19,10 +19,26 @@ const links = [
 export function AdminShell() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordMessage, setPasswordMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [saving, setSaving] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const { loading, currentInvestigator } = useWaswia();
   const navigate = useNavigate();
   useEffect(() => { if (!loading && currentInvestigator) void navigate({ to: "/", replace: true }); }, [loading, currentInvestigator, navigate]);
+  useEffect(() => { void supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? "")); }, []);
+
+  const changePassword = async (event: FormEvent) => {
+    event.preventDefault();
+    setSaving(true); setPasswordMessage(null);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setSaving(false);
+    if (error) { setPasswordMessage({ ok: false, text: error.message }); return; }
+    setPasswordMessage({ ok: true, text: "Mot de passe mis à jour." });
+    setNewPassword("");
+  };
   if (currentInvestigator) return null;
   return (
     <div className="min-h-screen bg-admin-background">
