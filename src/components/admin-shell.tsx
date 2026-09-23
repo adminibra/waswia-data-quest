@@ -69,6 +69,18 @@ export function AdminShell() {
         <Button variant="outline" size="icon" className="absolute -right-4 top-24 hidden rounded-full md:inline-flex" onClick={() => setCollapsed((v) => !v)} aria-label={collapsed ? "Déployer le menu" : "Réduire le menu"}>{collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}</Button>
       </aside>
       <main className={cn("min-h-screen transition-[margin]", collapsed ? "md:ml-[76px]" : "md:ml-64")}><div className="mx-auto max-w-[1400px] px-5 py-8 sm:px-8 md:px-10"><Outlet /></div></main>
+      <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Changer le mot de passe</DialogTitle></DialogHeader>
+          <form onSubmit={changePassword} className="space-y-4">
+            <label className="block text-sm font-medium">Nouveau mot de passe
+              <input required type="password" minLength={6} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="6 caractères minimum" className="mt-2 h-11 w-full rounded-lg border border-input bg-admin-background px-3 text-sm outline-none" />
+            </label>
+            {passwordMessage && <p className={cn("rounded-lg p-3 text-sm", passwordMessage.ok ? "bg-emerald-500/10 text-emerald-600" : "bg-destructive/10 text-destructive")}>{passwordMessage.text}</p>}
+            <Button disabled={saving} className="h-11 w-full bg-brand-gradient">{saving ? "Enregistrement..." : "Enregistrer"}</Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
