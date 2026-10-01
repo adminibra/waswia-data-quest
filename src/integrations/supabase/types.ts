@@ -76,31 +76,43 @@ export type Database = {
       }
       responses: {
         Row: {
+          accuracy: number | null
+          answers: Json
           collected_at: string
           gps: string
           id: string
           investigator_id: string | null
           investigator_name: string
+          latitude: number | null
+          longitude: number | null
           status: string
           survey_id: string | null
           survey_title: string
         }
         Insert: {
+          accuracy?: number | null
+          answers?: Json
           collected_at?: string
           gps?: string
           id?: string
           investigator_id?: string | null
           investigator_name?: string
+          latitude?: number | null
+          longitude?: number | null
           status?: string
           survey_id?: string | null
           survey_title?: string
         }
         Update: {
+          accuracy?: number | null
+          answers?: Json
           collected_at?: string
           gps?: string
           id?: string
           investigator_id?: string | null
           investigator_name?: string
+          latitude?: number | null
+          longitude?: number | null
           status?: string
           survey_id?: string | null
           survey_title?: string
@@ -125,6 +137,7 @@ export type Database = {
       surveys: {
         Row: {
           active: boolean
+          content: Json
           created_at: string
           description: string
           id: string
@@ -134,6 +147,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          content?: Json
           created_at?: string
           description?: string
           id?: string
@@ -143,6 +157,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          content?: Json
           created_at?: string
           description?: string
           id?: string
