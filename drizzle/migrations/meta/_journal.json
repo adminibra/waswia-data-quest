@@ -15,6 +15,13 @@
       "when": 1790065002892,
       "tag": "0001_add_investigator_user_id",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790833143916,
+      "tag": "0002_survey_content_and_answers",
+      "breakpoints": true
     }
   ]
 }

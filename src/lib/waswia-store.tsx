@@ -9,7 +9,10 @@ export type Survey = {
   questions: number;
   active: boolean;
   isPublic?: boolean;
+  content?: SurveyQuestion[];
 };
+
+export type SurveyQuestion = { id: number; label: string; type: string; required: boolean; options: string[]; other: boolean };
 
 export type Investigator = { id: string; name: string; email: string; surveys: number; userId: string | null };
 export type FieldResponse = {
@@ -66,7 +69,7 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
       supabase.from("responses").select("*").order("collected_at", { ascending: false }),
       supabase.from("assignments").select("*"),
     ]);
-    setSurveys((surveyRows.data ?? []).map((row) => ({ id: row.id, title: row.title, description: row.description, questions: row.questions, active: row.active, isPublic: row.is_public })));
+    setSurveys((surveyRows.data ?? []).map((row) => ({ id: row.id, title: row.title, description: row.description, questions: row.questions, active: row.active, isPublic: row.is_public, content: (Array.isArray(row.content) ? row.content : []) as unknown as SurveyQuestion[] })));
     setInvestigators((investigatorRows.data ?? []).map((row) => ({ id: row.id, name: row.name, email: row.email, userId: row.user_id ?? null })));
     setResponses((responseRows.data ?? []).map((row) => ({ id: row.id, survey: row.survey_title, investigator: row.investigator_name, date: formatDate(row.collected_at), gps: row.gps, status: row.status === "En attente" ? "En attente" : "Terminé" })));
     const map: Assignments = {};
@@ -106,8 +109,8 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
     assignedSurveys: (investigatorId) => surveys.filter((survey) => (assignments[investigatorId] ?? []).includes(survey.id)),
     assignSurvey: (investigatorId, surveyId) => { void run(() => supabase.from("assignments").insert({ investigator_id: investigatorId, survey_id: surveyId }).then()); },
     unassignSurvey: (investigatorId, surveyId) => { void run(() => supabase.from("assignments").delete().eq("investigator_id", investigatorId).eq("survey_id", surveyId).then()); },
-    addSurvey: (survey) => { void run(() => supabase.from("surveys").insert({ title: survey.title, description: survey.description, questions: survey.questions, active: survey.active, is_public: survey.isPublic ?? false }).then()); },
-    updateSurvey: (survey) => { void run(() => supabase.from("surveys").update({ title: survey.title, description: survey.description, questions: survey.questions, active: survey.active, is_public: survey.isPublic ?? false }).eq("id", survey.id).then()); },
+    addSurvey: (survey) => { void run(() => supabase.from("surveys").insert({ title: survey.title, description: survey.description, questions: survey.questions, active: survey.active, is_public: survey.isPublic ?? false, content: (survey.content ?? []) as never }).then()); },
+    updateSurvey: (survey) => { void run(() => supabase.from("surveys").update({ title: survey.title, description: survey.description, questions: survey.questions, active: survey.active, is_public: survey.isPublic ?? false, content: (survey.content ?? []) as never }).eq("id", survey.id).then()); },
     toggleSurvey: (id) => { const current = surveys.find((item) => item.id === id); if (!current) return; void run(() => supabase.from("surveys").update({ active: !current.active }).eq("id", id).then()); },
     deleteSurvey: (id) => { void run(() => supabase.from("surveys").delete().eq("id", id).then()); },
     addInvestigator: async (person) => {

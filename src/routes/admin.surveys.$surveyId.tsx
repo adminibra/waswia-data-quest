@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Eye, GripVertical, Layers3, Plus, Save, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -27,15 +27,17 @@ function SurveyEditor() {
   const survey = surveys.find((item) => String(item.id) === surveyId);
   const [title, setTitle] = useState(survey?.title ?? "X");
   const [parts, setParts] = useState(0);
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>((survey?.content as Question[] | undefined) ?? []);
   const [saved, setSaved] = useState(false);
+  useEffect(() => { if (survey) { setTitle(survey.title); setQuestions((survey.content as Question[] | undefined) ?? []); } }, [survey?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const nextId = useMemo(() => Math.max(0, ...questions.map((item) => item.id)) + 1, [questions]);
 
   const addQuestion = () => setQuestions((items) => [...items, { id: nextId, label: "", type: "Choix unique", required: true, options: ["Option 1", "Option 2"], other: false }]);
   const updateQuestion = (id: number, patch: Partial<Question>) => setQuestions((items) => items.map((item) => item.id === id ? { ...item, ...patch } : item));
   const save = () => {
-    if (survey) updateSurvey({ ...survey, title: title.trim() || "Sans titre", questions: questions.length });
-    else addSurvey({ title: title.trim() || "Sans titre", description: "Pas de description", questions: questions.length, active: false, isPublic: true });
+    if (survey) updateSurvey({ ...survey, title: title.trim() || "Sans titre", questions: questions.length, content: questions });
+    else addSurvey({ title: title.trim() || "Sans titre", description: "Pas de description", questions: questions.length, active: true, isPublic: true, content: questions });
+    navigate({ to: "/admin/surveys" });
     setSaved(true);
     window.setTimeout(() => setSaved(false), 900);
   };

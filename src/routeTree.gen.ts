@@ -16,6 +16,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminInvestigatorsRouteImport } from './routes/admin.investigators'
 import { Route as AdminReportingRouteImport } from './routes/admin.reporting'
 import { Route as AdminResponsesRouteImport } from './routes/admin.responses'
+import { Route as CollectSurveyIdRouteImport } from './routes/collect.$surveyId'
 import { Route as AdminSurveysIndexRouteImport } from './routes/admin.surveys.index'
 import { Route as AdminSurveysSurveyIdRouteImport } from './routes/admin.surveys.$surveyId'
 
@@ -54,6 +55,11 @@ const AdminResponsesRoute = AdminResponsesRouteImport.update({
   path: '/responses',
   getParentRoute: () => AdminRoute,
 } as any)
+const CollectSurveyIdRoute = CollectSurveyIdRouteImport.update({
+  id: '/collect/$surveyId',
+  path: '/collect/$surveyId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminSurveysIndexRoute = AdminSurveysIndexRouteImport.update({
   id: '/surveys/',
   path: '/surveys/',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/admin/investigators': typeof AdminInvestigatorsRoute
   '/admin/reporting': typeof AdminReportingRoute
   '/admin/responses': typeof AdminResponsesRoute
+  '/collect/$surveyId': typeof CollectSurveyIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/surveys/$surveyId': typeof AdminSurveysSurveyIdRoute
   '/admin/surveys/': typeof AdminSurveysIndexRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/admin/investigators': typeof AdminInvestigatorsRoute
   '/admin/reporting': typeof AdminReportingRoute
   '/admin/responses': typeof AdminResponsesRoute
+  '/collect/$surveyId': typeof CollectSurveyIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/surveys/$surveyId': typeof AdminSurveysSurveyIdRoute
   '/admin/surveys': typeof AdminSurveysIndexRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/admin/investigators': typeof AdminInvestigatorsRoute
   '/admin/reporting': typeof AdminReportingRoute
   '/admin/responses': typeof AdminResponsesRoute
+  '/collect/$surveyId': typeof CollectSurveyIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/surveys/$surveyId': typeof AdminSurveysSurveyIdRoute
   '/admin/surveys/': typeof AdminSurveysIndexRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/admin/investigators'
     | '/admin/reporting'
     | '/admin/responses'
+    | '/collect/$surveyId'
     | '/admin/'
     | '/admin/surveys/$surveyId'
     | '/admin/surveys/'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/admin/investigators'
     | '/admin/reporting'
     | '/admin/responses'
+    | '/collect/$surveyId'
     | '/admin'
     | '/admin/surveys/$surveyId'
     | '/admin/surveys'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/admin/investigators'
     | '/admin/reporting'
     | '/admin/responses'
+    | '/collect/$surveyId'
     | '/admin/'
     | '/admin/surveys/$surveyId'
     | '/admin/surveys/'
@@ -137,6 +149,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CollectSurveyIdRoute: typeof CollectSurveyIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -190,6 +203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminResponsesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/collect/$surveyId': {
+      id: '/collect/$surveyId'
+      path: '/collect/$surveyId'
+      fullPath: '/collect/$surveyId'
+      preLoaderRoute: typeof CollectSurveyIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/surveys/': {
       id: '/admin/surveys/'
       path: '/surveys'
@@ -231,6 +251,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  CollectSurveyIdRoute: CollectSurveyIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
