@@ -34,6 +34,8 @@ function Collect() {
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
 
+  useEffect(() => { void supabase.auth.getUser().then(({ data }) => { if (!data.user) navigate({ to: "/auth", replace: true }); }); }, [navigate]);
+
   useEffect(() => {
     if (!navigator.geolocation) { setGpsMsg("GPS non disponible sur cet appareil"); return; }
     const id = navigator.geolocation.watchPosition(

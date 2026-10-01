@@ -26,7 +26,7 @@ function Index() {
   const [syncing, setSyncing] = useState(false);
   const [email, setEmail] = useState("");
   const navigate = Route.useNavigate();
-  useEffect(() => { void supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? "")); }, []);
+  useEffect(() => { void supabase.auth.getUser().then(({ data }) => { if (!data.user) { navigate({ to: "/auth", replace: true }); return; } setEmail(data.user.email ?? ""); }); }, [navigate]);
   const sync = () => { setSyncing(true); void refresh().finally(() => window.setTimeout(() => setSyncing(false), 400)); };
   return (
     <div className="min-h-screen bg-admin-background">
