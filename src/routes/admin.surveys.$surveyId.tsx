@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Eye, GripVertical, Layers3, Plus, Save, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -29,6 +29,7 @@ function SurveyEditor() {
   const [parts, setParts] = useState(0);
   const [questions, setQuestions] = useState<Question[]>((survey?.content as Question[] | undefined) ?? []);
   const [saved, setSaved] = useState(false);
+  useEffect(() => { if (survey) { setTitle(survey.title); setQuestions((survey.content as Question[] | undefined) ?? []); } }, [survey?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const nextId = useMemo(() => Math.max(0, ...questions.map((item) => item.id)) + 1, [questions]);
 
   const addQuestion = () => setQuestions((items) => [...items, { id: nextId, label: "", type: "Choix unique", required: true, options: ["Option 1", "Option 2"], other: false }]);
