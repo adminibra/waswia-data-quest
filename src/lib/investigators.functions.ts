@@ -34,3 +34,18 @@ export const createInvestigatorAccount = createServerFn({ method: "POST" })
 
     return { ok: true as const };
   });
+
+const passwordSchema = z.object({
+  userId: z.string().uuid(),
+  password: z.string().min(6),
+});
+
+export const updateInvestigatorPassword = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => passwordSchema.parse(data))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, { password: data.password });
+    if (error) return { ok: false as const, message: error.message };
+    return { ok: true as const };
+  });
