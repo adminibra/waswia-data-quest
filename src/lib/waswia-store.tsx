@@ -22,6 +22,10 @@ export type FieldResponse = {
   date: string;
   gps: string;
   status: "Terminé" | "En attente";
+  surveyId: string | null;
+  investigatorId: string | null;
+  collectedAt: string;
+  answers: Record<string, unknown>;
 };
 
 export type Assignments = Record<string, string[]>;
@@ -71,7 +75,7 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
     ]);
     setSurveys((surveyRows.data ?? []).map((row) => ({ id: row.id, title: row.title, description: row.description, questions: row.questions, active: row.active, isPublic: row.is_public, content: (Array.isArray(row.content) ? row.content : []) as unknown as SurveyQuestion[] })));
     setInvestigators((investigatorRows.data ?? []).map((row) => ({ id: row.id, name: row.name, email: row.email, userId: row.user_id ?? null })));
-    setResponses((responseRows.data ?? []).map((row) => ({ id: row.id, survey: row.survey_title, investigator: row.investigator_name, date: formatDate(row.collected_at), gps: row.gps, status: row.status === "En attente" ? "En attente" : "Terminé" })));
+    setResponses((responseRows.data ?? []).map((row) => ({ id: row.id, survey: row.survey_title, investigator: row.investigator_name, date: formatDate(row.collected_at), gps: row.gps, status: row.status === "En attente" ? "En attente" : "Terminé", surveyId: row.survey_id, investigatorId: row.investigator_id, collectedAt: row.collected_at, answers: (row.answers && typeof row.answers === "object" && !Array.isArray(row.answers) ? row.answers : {}) as Record<string, unknown> })));
     const map: Assignments = {};
     for (const row of assignmentRows.data ?? []) {
       map[row.investigator_id] = [...(map[row.investigator_id] ?? []), row.survey_id];
