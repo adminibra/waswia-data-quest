@@ -33,6 +33,9 @@ function Collect() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
+  const [step, setStep] = useState(0);
+  const isEmpty = (qid: number) => { const v = answers[qid]; return v === undefined || v === "" || (Array.isArray(v) && v.length === 0); };
+  const next = () => { const q = questions[step]; if (q?.required && isEmpty(q.id)) { setError("Cette question est obligatoire."); return; } setError(""); if (step < questions.length - 1) setStep(step + 1); else void submit(); };
 
   useEffect(() => { void supabase.auth.getUser().then(({ data }) => { if (!data.user) navigate({ to: "/auth", replace: true }); }); }, [navigate]);
 
@@ -97,14 +100,15 @@ function Collect() {
             <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
             <p className="mt-3 text-lg font-bold">Réponse enregistrée</p>
             <div className="mt-5 flex justify-center gap-2">
-              <Button variant="outline" onClick={() => { setAnswers({}); setOthers({}); setDone(false); }}>Nouvelle collecte</Button>
+              <Button variant="outline" onClick={() => { setAnswers({}); setOthers({}); setStep(0); setDone(false); }}>Nouvelle collecte</Button>
               <Button onClick={() => navigate({ to: "/" })}>Accueil</Button>
             </div>
           </div>
         ) : (
           <>
             {questions.length === 0 && <p className="rounded-xl bg-card p-4 text-sm text-muted-foreground shadow-md">Cette enquête ne contient encore aucune question. L'administrateur doit ajouter des questions puis enregistrer.</p>}
-            {questions.map((q, i) => (
+            {questions.length > 0 && <div><p className="text-sm font-semibold">Question {step + 1} sur {questions.length}</p><div className="mt-2 h-2 rounded-full bg-muted"><div className="h-2 rounded-full bg-primary transition-all" style={{ width: `${((step + 1) / questions.length) * 100}%` }} /></div></div>}
+            {questions.map((q, i) => i !== step ? null : (
               <section key={q.id} className="rounded-xl bg-card p-5 shadow-md">
                 <p className="font-semibold">{i + 1}. {q.label || "Question sans titre"} {q.required && <span className="text-destructive">*</span>}</p>
                 <div className="mt-3 space-y-2">
@@ -125,7 +129,7 @@ function Collect() {
               </section>
             ))}
             {error && <p className="text-sm text-destructive">{error}</p>}
-            {questions.length > 0 && <Button className="w-full bg-brand-gradient" disabled={saving} onClick={submit}><Send /> {saving ? "Envoi…" : "Envoyer la réponse"}</Button>}
+            {questions.length > 0 && <div className="flex gap-2"><Button variant="outline" className="flex-1" disabled={step === 0 || saving} onClick={() => { setError(""); setStep(step - 1); }}>Précédent</Button><Button className="flex-1 bg-brand-gradient" disabled={saving} onClick={next}>{step === questions.length - 1 ? <><Send /> {saving ? "Envoi…" : "Terminer l’enquête"}</> : "Suivant"}</Button></div>}
           </>
         )}
       </main>
