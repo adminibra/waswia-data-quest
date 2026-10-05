@@ -6,6 +6,7 @@ const schema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(6),
+  island: z.string().default(""),
 });
 
 export const createInvestigatorAccount = createServerFn({ method: "POST" })
@@ -25,7 +26,7 @@ export const createInvestigatorAccount = createServerFn({ method: "POST" })
 
     const { error: rowError } = await supabaseAdmin
       .from("investigators")
-      .insert({ name: data.name, email: data.email, user_id: created.user.id });
+      .insert({ name: data.name, email: data.email, island: data.island, user_id: created.user.id });
 
     if (rowError) {
       await supabaseAdmin.auth.admin.deleteUser(created.user.id);
