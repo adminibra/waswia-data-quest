@@ -10,7 +10,7 @@ import { useWaswia } from "@/lib/waswia-store";
 
 const links = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/surveys", label: "Sondages", icon: ClipboardList },
+  { to: "/admin/surveys", label: "Enquêtes", icon: ClipboardList },
   { to: "/admin/investigators", label: "Enquêteurs", icon: Users },
   { to: "/admin/responses", label: "Réponses", icon: FileText },
   { to: "/admin/reporting", label: "Reporting", icon: BarChart3 },

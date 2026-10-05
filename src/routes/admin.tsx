@@ -4,9 +4,9 @@ import { AdminShell } from "@/components/admin-shell";
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [
     { title: "Administration — WASWIA" },
-    { name: "description", content: "Administration des sondages et données WASWIA." },
+    { name: "description", content: "Administration des enquêtes et données WASWIA." },
     { property: "og:title", content: "Administration — WASWIA" },
-    { property: "og:description", content: "Administration des sondages et données WASWIA." },
+    { property: "og:description", content: "Administration des enquêtes et données WASWIA." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
