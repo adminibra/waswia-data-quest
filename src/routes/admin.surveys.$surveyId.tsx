@@ -9,9 +9,9 @@ import { useWaswia } from "@/lib/waswia-store";
 export const Route = createFileRoute("/admin/surveys/$surveyId")({
   head: () => ({ meta: [
     { title: "Éditeur d'enquête — WASWIA" },
-    { name: "description", content: "Créez et organisez les questions d’Une enquête WASWIA." },
+    { name: "description", content: "Créez et organisez les questions d’une enquête WASWIA." },
     { property: "og:title", content: "Éditeur d'enquête — WASWIA" },
-    { property: "og:description", content: "Créez et organisez les questions d’Une enquête WASWIA." },
+    { property: "og:description", content: "Créez et organisez les questions d’une enquête WASWIA." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
