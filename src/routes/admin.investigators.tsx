@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ClipboardList, Eye, Mail, MoreVertical, Pencil, Plus, Search, Trash2, UserPlus } from "lucide-react";
+import { ClipboardList, Eye, KeyRound, Mail, MoreVertical, Pencil, Plus, Search, Trash2, UserPlus } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { PageHeading } from "@/components/page-heading";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { updateInvestigatorPassword } from "@/lib/investigators.functions";
 import { useWaswia } from "@/lib/waswia-store";
 
 export const Route = createFileRoute("/admin/investigators")({ head: () => ({ meta: [{ title: "Enquêteurs — WASWIA" }, { name: "description", content: "Gérez l'équipe terrain WASWIA." }, { property: "og:title", content: "Enquêteurs — WASWIA" }, { property: "og:description", content: "Gérez l'équipe terrain WASWIA." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: Investigators });
