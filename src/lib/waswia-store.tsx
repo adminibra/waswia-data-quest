@@ -14,7 +14,7 @@ export type Survey = {
 
 export type SurveyQuestion = { id: number; label: string; type: string; required: boolean; options: string[]; other: boolean };
 
-export type Investigator = { id: string; name: string; email: string; surveys: number; userId: string | null };
+export type Investigator = { id: string; name: string; email: string; island: string; surveys: number; userId: string | null };
 export type FieldResponse = {
   id: string;
   survey: string;
@@ -46,7 +46,7 @@ type Store = {
   updateSurvey: (survey: Survey) => void;
   toggleSurvey: (id: string) => void;
   deleteSurvey: (id: string) => void;
-  addInvestigator: (person: { name: string; email: string; password: string }) => Promise<{ ok: boolean; message?: string }>;
+  addInvestigator: (person: { name: string; email: string; password: string; island: string }) => Promise<{ ok: boolean; message?: string }>;
   deleteInvestigator: (id: string) => void;
   deleteResponse: (id: string) => void;
 };
@@ -74,7 +74,7 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
       supabase.from("assignments").select("*"),
     ]);
     setSurveys((surveyRows.data ?? []).map((row) => ({ id: row.id, title: row.title, description: row.description, questions: row.questions, active: row.active, isPublic: row.is_public, content: (Array.isArray(row.content) ? row.content : []) as unknown as SurveyQuestion[] })));
-    setInvestigators((investigatorRows.data ?? []).map((row) => ({ id: row.id, name: row.name, email: row.email, userId: row.user_id ?? null })));
+    setInvestigators((investigatorRows.data ?? []).map((row) => ({ id: row.id, name: row.name, email: row.email, island: row.island ?? "", userId: row.user_id ?? null })));
     setResponses((responseRows.data ?? []).map((row) => ({ id: row.id, survey: row.survey_title, investigator: row.investigator_name, date: formatDate(row.collected_at), gps: row.gps, status: row.status === "En attente" ? "En attente" : "Terminé", surveyId: row.survey_id, investigatorId: row.investigator_id, collectedAt: row.collected_at, answers: (row.answers && typeof row.answers === "object" && !Array.isArray(row.answers) ? row.answers : {}) as Record<string, unknown> })));
     const map: Assignments = {};
     for (const row of assignmentRows.data ?? []) {
