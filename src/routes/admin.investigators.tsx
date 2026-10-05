@@ -15,6 +15,18 @@ function Investigators() {
   const { investigators, surveys, responses, assignments, addInvestigator, deleteInvestigator, assignSurvey, unassignSurvey } = useWaswia();
   const [query, setQuery] = useState(""); const [open, setOpen] = useState(false); const [assignId, setAssignId] = useState<string | null>(null);
   const [error, setError] = useState(""); const [saving, setSaving] = useState(false);
+  const [passwordTarget, setPasswordTarget] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState(""); const [passwordMsg, setPasswordMsg] = useState<{ ok: boolean; text: string } | null>(null); const [savingPassword, setSavingPassword] = useState(false);
+  const passwordPerson = investigators.find((p) => p.id === passwordTarget) ?? null;
+  const submitPassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!passwordPerson?.userId) { setPasswordMsg({ ok: false, text: "Cet enquêteur n'a pas de compte de connexion." }); return; }
+    setSavingPassword(true); setPasswordMsg(null);
+    const result = await updateInvestigatorPassword({ data: { userId: passwordPerson.userId, password: newPassword } });
+    setSavingPassword(false);
+    if (!result.ok) { setPasswordMsg({ ok: false, text: result.message ?? "Modification impossible" }); return; }
+    setPasswordMsg({ ok: true, text: "Mot de passe mis à jour." }); setNewPassword("");
+  };
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
