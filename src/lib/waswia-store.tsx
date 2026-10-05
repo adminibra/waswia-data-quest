@@ -51,7 +51,9 @@ type Store = {
   deleteResponse: (id: string) => void;
 };
 
-const WaswiaContext = createContext<Store | null>(null);
+// Keep a single context instance across hot reloads to avoid provider/consumer mismatch.
+const ctxHolder = globalThis as unknown as { __waswiaCtx?: React.Context<Store | null> };
+const WaswiaContext = (ctxHolder.__waswiaCtx ??= createContext<Store | null>(null));
 
 function formatDate(value: string) {
   const date = new Date(value);
