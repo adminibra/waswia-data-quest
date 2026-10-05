@@ -8,10 +8,10 @@ import { useWaswia } from "@/lib/waswia-store";
 
 export const Route = createFileRoute("/admin/surveys/$surveyId")({
   head: () => ({ meta: [
-    { title: "Éditeur de sondage — WASWIA" },
-    { name: "description", content: "Créez et organisez les questions d’un sondage WASWIA." },
-    { property: "og:title", content: "Éditeur de sondage — WASWIA" },
-    { property: "og:description", content: "Créez et organisez les questions d’un sondage WASWIA." },
+    { title: "Éditeur de enquête — WASWIA" },
+    { name: "description", content: "Créez et organisez les questions d’Une enquête WASWIA." },
+    { property: "og:title", content: "Éditeur de enquête — WASWIA" },
+    { property: "og:description", content: "Créez et organisez les questions d’Une enquête WASWIA." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
@@ -46,9 +46,9 @@ function SurveyEditor() {
     <div className="space-y-7">
       <header className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 items-start gap-5">
-          <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/surveys" })} aria-label="Retour aux sondages"><ArrowLeft /></Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/surveys" })} aria-label="Retour aux enquêtes"><ArrowLeft /></Button>
           <div className="min-w-0">
-            <Input value={title} onChange={(event) => setTitle(event.target.value)} className="h-8 border-0 bg-transparent p-0 text-2xl font-bold shadow-none focus-visible:ring-0" aria-label="Titre du sondage" />
+            <Input value={title} onChange={(event) => setTitle(event.target.value)} className="h-8 border-0 bg-transparent p-0 text-2xl font-bold shadow-none focus-visible:ring-0" aria-label="Titre de l'enquête" />
             <p className="text-sm text-muted-foreground">{parts} parties · {questions.length} question{questions.length > 1 ? "s" : ""}</p>
           </div>
         </div>
