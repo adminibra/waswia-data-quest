@@ -12,10 +12,12 @@ import { useWaswia } from "@/lib/waswia-store";
 export const Route = createFileRoute("/admin/investigators")({ head: () => ({ meta: [{ title: "Enquêteurs — WASWIA" }, { name: "description", content: "Gérez l'équipe terrain WASWIA." }, { property: "og:title", content: "Enquêteurs — WASWIA" }, { property: "og:description", content: "Gérez l'équipe terrain WASWIA." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: Investigators });
 
 function Investigators() {
-  const { investigators, surveys, responses, assignments, addInvestigator, deleteInvestigator, assignSurvey, unassignSurvey } = useWaswia();
+  const { investigators, surveys, responses, assignments, addInvestigator, updateInvestigator, deleteInvestigator, assignSurvey, unassignSurvey } = useWaswia();
   const [query, setQuery] = useState(""); const [open, setOpen] = useState(false); const [assignId, setAssignId] = useState<string | null>(null);
   const [error, setError] = useState(""); const [saving, setSaving] = useState(false);
   const [passwordTarget, setPasswordTarget] = useState<string | null>(null);
+  const [editTarget, setEditTarget] = useState<string | null>(null);
+  const [editError, setEditError] = useState(""); const [savingEdit, setSavingEdit] = useState(false);
   const [newPassword, setNewPassword] = useState(""); const [passwordMsg, setPasswordMsg] = useState<{ ok: boolean; text: string } | null>(null); const [savingPassword, setSavingPassword] = useState(false);
   const passwordPerson = investigators.find((p) => p.id === passwordTarget) ?? null;
   const submitPassword = async (event: FormEvent<HTMLFormElement>) => {
