@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { createInvestigatorAccount } from "@/lib/investigators.functions";
+import { createInvestigatorAccount, updateInvestigatorInfo } from "@/lib/investigators.functions";
 
 export type Survey = {
   id: string;
@@ -47,6 +47,7 @@ type Store = {
   toggleSurvey: (id: string) => void;
   deleteSurvey: (id: string) => void;
   addInvestigator: (person: { name: string; email: string; password: string; island: string }) => Promise<{ ok: boolean; message?: string }>;
+  updateInvestigator: (person: { id: string; name: string; email: string; island: string }) => Promise<{ ok: boolean; message?: string }>;
   deleteInvestigator: (id: string) => void;
   deleteResponse: (id: string) => void;
 };
@@ -124,6 +125,15 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
     addInvestigator: async (person) => {
       try {
         const result = await createInvestigatorAccount({ data: person });
+        await refresh();
+        return result.ok ? { ok: true } : { ok: false, message: result.message };
+      } catch (error) {
+        return { ok: false, message: error instanceof Error ? error.message : "Erreur inconnue" };
+      }
+    },
+    updateInvestigator: async (person) => {
+      try {
+        const result = await updateInvestigatorInfo({ data: person });
         await refresh();
         return result.ok ? { ok: true } : { ok: false, message: result.message };
       } catch (error) {
