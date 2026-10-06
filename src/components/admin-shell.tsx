@@ -39,7 +39,7 @@ export function AdminShell() {
     setPasswordMessage({ ok: true, text: "Mot de passe mis à jour." });
     setNewPassword("");
   };
-  if (currentInvestigator) return null;
+  if (loading || currentInvestigator) return null;
   return (
     <div className="min-h-screen bg-admin-background">
       <Button variant="outline" size="icon" className="fixed left-4 top-4 z-40 md:hidden" onClick={() => setMobileOpen(true)} aria-label="Ouvrir le menu"><Menu /></Button>

@@ -69,6 +69,8 @@ export function WaswiaProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
+    const { data: authData } = await supabase.auth.getUser();
+    setUserId(authData.user?.id ?? null);
     const [surveyRows, investigatorRows, responseRows, assignmentRows] = await Promise.all([
       supabase.from("surveys").select("*").order("created_at", { ascending: true }),
       supabase.from("investigators").select("*").order("created_at", { ascending: true }),
