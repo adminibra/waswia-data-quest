@@ -83,6 +83,7 @@ function Collect() {
 
   if (loading) return <p className="p-6 text-muted-foreground">Chargement…</p>;
   if (!survey) return <div className="p-6"><p>Enquête introuvable.</p><Button className="mt-4" onClick={() => navigate({ to: "/" })}>Retour</Button></div>;
+  if (currentInvestigator && !survey.active) return <div className="p-6"><p>Cette enquête est désactivée. Contactez l'administrateur.</p><Button className="mt-4" onClick={() => navigate({ to: "/" })}>Retour</Button></div>;
 
   return (
     <div className="min-h-screen bg-admin-background">

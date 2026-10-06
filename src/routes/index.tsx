@@ -20,7 +20,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { surveys, responses, refresh, currentInvestigator, assignedSurveys } = useWaswia();
-  const visibleSurveys = currentInvestigator ? assignedSurveys(currentInvestigator.id) : surveys;
+  const visibleSurveys = currentInvestigator ? assignedSurveys(currentInvestigator.id).filter((s) => s.active) : surveys;
   const mine = currentInvestigator ? responses.filter((r) => r.investigatorId === currentInvestigator.id) : responses;
   const doneCount = mine.filter((response) => response.status === "Terminé").length;
   const pendingCount = mine.filter((response) => response.status === "En attente").length;
